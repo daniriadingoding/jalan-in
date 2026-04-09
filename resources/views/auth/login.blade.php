@@ -1,41 +1,23 @@
 <x-guest-layout>
-    <div class="glass-panel rounded-3xl p-8 sm:p-10 lg:p-12 relative" x-data="{
+    <div class="glass-panel p-6 sm:p-8 lg:p-10 relative" x-data="{
         submitting: false,
         showPassword: false,
-        emailFocused: false,
-        passFocused: false,
     }">
 
-        {{-- Logo --}}
-        <div class="text-center mb-8 lg:mb-10">
-            <a href="/" class="inline-block">
-                <h1 class="text-4xl lg:text-5xl font-black tracking-tight" style="color: var(--maroon);">
-                    jalan.in
-                </h1>
-            </a>
-        </div>
-
         {{-- Welcome Text --}}
-        <div class="mb-8 lg:mb-10">
-            <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-2">
-                Selamat datang kembali
+        <div class="text-center mb-6 sm:mb-8">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+                Selamat Datang Kembali
             </h2>
-            <p class="text-sm lg:text-base text-gray-500 leading-relaxed">
-                Masuk ke akun Anda untuk lanjut melaporkan dan memperbaiki infrastruktur jalan kita.
+            <p class="text-sm text-gray-500 leading-relaxed">
+                Masuk untuk mengelola infrastruktur sipil Anda.
             </p>
         </div>
 
         {{-- Session Status --}}
         @if (session('status'))
-            <div class="alert-success mb-6">
+            <div class="alert-success mb-5">
                 {{ session('status') }}
-            </div>
-        @endif
-
-        {{-- Server Error --}}
-        @if ($errors->has('email') && $errors->first('email') === __('auth.failed'))
-            <div class="alert-error mb-6">
-                Kombinasi email dan kata sandi salah. Silakan coba lagi.
             </div>
         @endif
 
@@ -43,16 +25,15 @@
             @csrf
 
             {{-- Email Field --}}
-            <div class="mb-6 lg:mb-8">
+            <div class="mb-5 sm:mb-6">
                 <label for="email" class="label-antigravity block mb-2">
                     EMAIL
                 </label>
                 <div class="input-group">
-                    {{-- @ Icon --}}
                     <div class="input-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="4"/>
-                            <path d="M16 8v5a3 3 0 006 0v-1a10 10 0 10-3.92 7.94"/>
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="M22 7l-10 6L2 7"/>
                         </svg>
                     </div>
                     <input
@@ -60,13 +41,11 @@
                         type="email"
                         name="email"
                         value="{{ old('email') }}"
-                        placeholder="Masukkan Email Anda"
+                        placeholder="pengguna@jalan.in"
                         required
                         autofocus
                         autocomplete="username"
                         class="input-antigravity w-full"
-                        x-on:focus="emailFocused = true"
-                        x-on:blur="emailFocused = false"
                     >
                 </div>
                 @error('email')
@@ -77,19 +56,18 @@
             </div>
 
             {{-- Password Field --}}
-            <div class="mb-8 lg:mb-10">
+            <div class="mb-5 sm:mb-6">
                 <div class="flex items-center justify-between mb-2">
                     <label for="password" class="label-antigravity">
-                        KATA SANDI
+                        PASSWORD
                     </label>
                     @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="link-maroon text-xs lg:text-sm">
-                            Lupa Kata Sandi?
+                        <a href="{{ route('password.request') }}" class="link-maroon text-xs">
+                            Lupa Password
                         </a>
                     @endif
                 </div>
                 <div class="input-group">
-                    {{-- Lock Icon --}}
                     <div class="input-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -100,12 +78,10 @@
                         id="password"
                         :type="showPassword ? 'text' : 'password'"
                         name="password"
-                        placeholder="••••••••"
+                        placeholder="password123"
                         required
                         autocomplete="current-password"
                         class="input-antigravity w-full"
-                        x-on:focus="passFocused = true"
-                        x-on:blur="passFocused = false"
                     >
                     {{-- Toggle Password Visibility --}}
                     <button
@@ -129,19 +105,17 @@
                 @enderror
             </div>
 
-            {{-- Remember Me --}}
-            <div class="flex items-center mb-8">
-                <input
-                    id="remember_me"
-                    type="checkbox"
-                    name="remember"
-                    class="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-offset-0"
-                    style="color: var(--maroon); --tw-ring-color: rgba(107,29,42,0.3);"
-                >
-                <label for="remember_me" class="ml-2.5 text-sm text-gray-500 select-none cursor-pointer">
-                    Ingat saya
-                </label>
-            </div>
+            {{-- Auth Failed Error --}}
+            @if ($errors->has('email') && $errors->first('email') === __('auth.failed'))
+                <div class="alert-error-inline mb-5 flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>Email atau password salah</span>
+                </div>
+            @endif
 
             {{-- Submit Button --}}
             <button
@@ -152,13 +126,6 @@
                 <span x-show="!submitting">Masuk</span>
                 <span x-show="submitting" x-cloak>Masuk...</span>
 
-                {{-- Arrow Icon --}}
-                <svg x-show="!submitting" class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                    <polyline points="12 5 19 12 12 19"/>
-                </svg>
-
-                {{-- Loading Spinner --}}
                 <svg x-show="submitting" x-cloak class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
@@ -167,10 +134,10 @@
         </form>
 
         {{-- Register Link --}}
-        <div class="text-center mt-8 lg:mt-10">
+        <div class="text-center mt-6 sm:mt-8">
             <p class="text-sm text-gray-500">
                 Belum punya akun?
-                <a href="{{ route('register') }}" class="link-maroon ml-1">
+                <a href="{{ route('register') }}" class="link-maroon ml-1 font-bold">
                     Daftar
                 </a>
             </p>
