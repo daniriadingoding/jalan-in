@@ -28,6 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if ($request->user()->role === 'user') {
+            // Jika yang login adalah 'user', paksa logout
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // Kembalikan ke halaman login dengan pesan error
+            return redirect('/login')->withErrors([
+                'email' => 'Akses ditolak. User silakan gunakan Aplikasi Mobile Jalan.In.',
+            ]);
+        }
+
+        // Jika yang login adalah admin atau operator, lanjutkan ke dasbor
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
