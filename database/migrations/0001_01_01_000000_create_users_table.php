@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'operator', 'user'])->default('user'); // Menambahkan kolom role dengan nilai default 'user'
+            $table->string('fcm_token')->nullable(); // Token Firebase Cloud Messaging untuk push notification ke mobile
             $table->rememberToken();
             $table->timestamps();
         });
