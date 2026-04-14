@@ -40,7 +40,11 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        // Jika yang login adalah admin atau operator, lanjutkan ke dasbor
+        // Jika yang login adalah admin atau operator, arahkan ke dasbor admin
+        if ($request->user()->role === 'admin') {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
