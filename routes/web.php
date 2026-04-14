@@ -36,4 +36,4 @@ Route::middleware(['auth', 'role.admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
