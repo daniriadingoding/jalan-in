@@ -13,20 +13,55 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Membuat Akun Administrator
+        // Admin (hanya bisa dibuat via seeder, sesuai proposal)
         User::create([
-            'name' => 'Super Admin Jalan.In',
-            'email' => 'admin@jalanin.com',
+            'name' => 'Admin Utama',
+            'email' => 'admin@jalan.in',
             'password' => Hash::make('password'),
-            'role' => 'admin', // Menggunakan role 'admin' sesuai migrasi
+            'role' => 'admin',
+            'email_verified_at' => now(),
         ]);
 
-        // Membuat Akun Operator
+        // Sample Operators
         User::create([
-            'name' => 'Petugas Lapangan',
-            'email' => 'operator@jalanin.com',
+            'name' => 'Ahmad Suhendra',
+            'email' => 'ahmad.s@jalan.in',
             'password' => Hash::make('password'),
-            'role' => 'operator', // Menggunakan role 'operator' sesuai migrasi
+            'role' => 'operator',
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'Siti Aminah',
+            'email' => 'siti.a@jalan.in',
+            'password' => Hash::make('password'),
+            'role' => 'operator',
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'Budi Cahyo',
+            'email' => 'budi.c@jalan.in',
+            'password' => Hash::make('password'),
+            'role' => 'operator',
+            'email_verified_at' => now(),
+        ]);
+
+        // Sample regular users
+        User::create([
+            'name' => 'Marcus Aris',
+            'email' => 'marcus.aris@jalan.in',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'Siti Nurhaliza',
+            'email' => 'siti.n@jalan.in',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'email_verified_at' => now(),
         ]);
     }
 }
