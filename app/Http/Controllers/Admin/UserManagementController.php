@@ -5,54 +5,135 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 
 class UserManagementController extends Controller
 {
     /**
-     * Display the user management page.
+     * Display the user management page with filtering and sorting.
      */
-    public function index()
+    public function index(Request $request)
     {
         $totalUsers = User::count();
         $totalAdmins = User::where('role', 'admin')->count();
         $totalOperators = User::where('role', 'operator')->count();
 
-        $users = User::orderBy('created_at', 'desc')->paginate(10);
+        $query = User::query();
 
-        return view('admin.users.index', compact('totalUsers', 'totalAdmins', 'totalOperators', 'users'));
+        // Filter by role
+        $roleFilter = $request->get('role', 'all');
+        if ($roleFilter !== 'all' && in_array($roleFilter, ['admin', 'operator', 'user'])) {
+            $query->where('role', $roleFilter);
+        }
+
+        // Search
+        $search = $request->get('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Sort
+        $sort = $request->get('sort', 'terbaru');
+        switch ($sort) {
+            case 'terlama':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'nama_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'nama_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            default: // 'terbaru'
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $users = $query->paginate(10)->appends($request->query());
+
+        return view('admin.users.index', compact(
+            'totalUsers', 'totalAdmins', 'totalOperators', 'users',
+            'roleFilter', 'sort', 'search'
+        ));
     }
 
     /**
-     * Show the form for creating a new operator.
+     * Show the add operator page — displays list of users with role 'user'
+     * so admin can promote them to 'operator'.
      */
-    public function create()
+    public function add(Request $request)
     {
-        return view('admin.users.create');
+        $query = User::where('role', 'user');
+
+        // Search by name or email
+        $search = $request->get('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+
+        return view('admin.users.add', compact('users', 'search'));
     }
 
     /**
-     * Store a newly created operator.
+     * Promote a user (role: user) to operator.
      */
-    public function store(Request $request)
+    public function promote(User $user)
+    {
+        // Only allow promoting users with role 'user'
+        if ($user->role !== 'user') {
+            return redirect()->route('admin.users.add')
+                ->with('error', 'Hanya akun dengan role "User" yang dapat dipromosikan menjadi Operator.');
+        }
+
+        $user->update(['role' => 'operator']);
+
+        return redirect()->route('admin.users.add')
+            ->with('success', "Akun \"{$user->name}\" berhasil dipromosikan menjadi Operator.");
+    }
+
+    /**
+     * Show user detail page for admin to view info and change role.
+     */
+    public function show(User $user)
+    {
+        return view('admin.users.show', compact('user'));
+    }
+
+    /**
+     * Update user role from the detail page.
+     */
+    public function updateRole(Request $request, User $user)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', Rules\Password::defaults()],
-            'region' => ['nullable', 'string', 'max:255'],
+            'role' => ['required', 'string', 'in:user,operator'],
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'operator',
-            'email_verified_at' => now(),
-        ]);
+        // Prevent changing admin role
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.users.show', $user)
+                ->with('error', 'Role Super Admin tidak dapat diubah.');
+        }
 
-        return redirect()->route('admin.users.index')
-            ->with('success', 'Operator berhasil ditambahkan.');
+        $oldRole = $user->role;
+        $newRole = $request->role;
+
+        if ($oldRole === $newRole) {
+            return redirect()->route('admin.users.show', $user)
+                ->with('info', 'Role tidak berubah.');
+        }
+
+        $user->update(['role' => $newRole]);
+
+        $roleLabels = ['user' => 'User', 'operator' => 'Operator'];
+
+        return redirect()->route('admin.users.show', $user)
+            ->with('success', "Role \"{$user->name}\" berhasil diubah dari {$roleLabels[$oldRole]} menjadi {$roleLabels[$newRole]}.");
     }
 }

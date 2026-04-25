@@ -95,7 +95,7 @@
                 <h2 class="section-title">Pengelolaan Operator</h2>
                 <p class="section-subtitle">Gambaran singkat mengenai tenaga kerja operasional saat ini.</p>
             </div>
-            <a href="{{ route('admin.users.create') }}" class="btn-admin-primary">
+            <a href="{{ route('admin.users.add') }}" class="btn-admin-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>

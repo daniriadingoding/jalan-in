@@ -24,6 +24,8 @@ class ReportResource extends JsonResource
             'damage_type' => $this->damage_type,
             'ai_photo_url' => $this->ai_photo_path ? asset('storage/' . $this->ai_photo_path) : null,
             'status' => $this->status,
+            'status_color' => $this->statusColor(),
+            'is_mine' => $this->user_id === auth('sanctum')->id(),
             'operator_name' => $this->operator ? $this->operator->name : null,
             'rejection_note' => $this->rejection_note,
             'evidence_photo_url' => $this->evidence_photo_path ? asset('storage/' . $this->evidence_photo_path) : null,

@@ -19,5 +19,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Laporan
     Route::get('/reports', [ReportController::class, 'index']);
+    Route::get('/reports/map', [ReportController::class, 'map']);
     Route::post('/reports', [ReportController::class, 'store']);
 });

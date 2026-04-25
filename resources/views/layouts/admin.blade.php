@@ -609,8 +609,10 @@
         {{-- ===== SIDEBAR ===== --}}
         <aside class="admin-sidebar">
             <div class="sidebar-brand">
-                <h1>jalan.in</h1>
-                <p>Pemantauan Jalan</p>
+                <a href="{{ route('admin.dashboard') }}" style="text-decoration:none;">
+                    <h1>jalan.in</h1>
+                    <p>Pemantauan Jalan</p>
+                </a>
             </div>
 
             <nav class="sidebar-nav">
@@ -642,7 +644,12 @@
                 </div>
                 <div class="sidebar-user-info">
                     <h4>{{ Auth::user()->name ?? 'Admin' }}</h4>
-                    <p>Super Admin</p>
+                    <p>
+                        @if(Auth::user()->role === 'admin') Super Admin
+                        @elseif(Auth::user()->role === 'operator') Operator
+                        @else User
+                        @endif
+                    </p>
                 </div>
             </div>
         </aside>

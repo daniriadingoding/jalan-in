@@ -27,11 +27,34 @@ class Report extends Model
     ];
 
     protected $casts = [
-        'verified_at' => 'datetime',
+        'verified_at'  => 'datetime',
         'completed_at' => 'datetime',
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
+        'latitude'     => 'float',
+        'longitude'    => 'float',
     ];
+
+    /**
+     * Warna pin per status untuk Leaflet map.
+     */
+    public function statusColor(): string
+    {
+        return match($this->status) {
+            'Dilaporkan'  => '#EF4444',
+            'Disurvey'    => '#F59E0B',
+            'Tidak Valid' => '#374151',
+            'Diproses'    => '#3B82F6',
+            'Selesai'     => '#22C55E',
+            default       => '#9CA3AF',
+        };
+    }
+
+    /**
+     * Apakah laporan ini visibel secara publik di peta mobile?
+     */
+    public function isPubliclyVisible(): bool
+    {
+        return in_array($this->status, ['Dilaporkan', 'Disurvey', 'Diproses']);
+    }
 
     /**
      * Relasi ke pelapor (User)
