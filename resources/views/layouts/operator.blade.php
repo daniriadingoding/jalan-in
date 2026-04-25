@@ -66,8 +66,16 @@
         .sidebar-user-info p { font-size: 0.65rem; color: #9ca3af; }
 
         /* ===== Main Content ===== */
-        .admin-main { flex: 1; margin-left: 240px; min-height: 100vh; }
-        .admin-topbar { display: flex; justify-content: flex-end; align-items: center; padding: 16px 40px; gap: 16px; }
+        .admin-main { flex: 1; margin-left: 240px; min-height: 100vh; position: relative; }
+        .admin-topbar { 
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: center; 
+            padding: 16px 40px; 
+            gap: 16px; 
+            position: relative; 
+            z-index: 1100; /* Pastikan di atas elemen Leaflet (1000) */
+        }
         .topbar-icon { width: 40px; height: 40px; border-radius: 50%; background: white; border: 1px solid rgba(107, 29, 42, 0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; color: #7a6a6d; }
         .topbar-icon:hover { background: rgba(107, 29, 42, 0.04); color: var(--maroon, #6B1D2A); }
         .admin-content { padding: 0 40px 40px; }
@@ -141,7 +149,19 @@
 
         /* Profile Dropdown */
         .profile-container { position: relative; }
-        .dropdown-menu { position: absolute; top: calc(100% + 12px); right: 0; width: 200px; background: white; border: 1px solid rgba(107, 29, 42, 0.08); border-radius: 12px; box-shadow: 0 10px 25px rgba(107, 29, 42, 0.08); padding: 8px; z-index: 50; display: none; }
+        .dropdown-menu { 
+            position: absolute; 
+            top: calc(100% + 12px); 
+            right: 0; 
+            width: 200px; 
+            background: white; 
+            border: 1px solid rgba(107, 29, 42, 0.08); 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(107, 29, 42, 0.08); 
+            padding: 8px; 
+            z-index: 1200; /* Di atas topbar */
+            display: none; 
+        }
         .dropdown-menu.show { display: block; }
         .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #4b5563; font-size: 0.875rem; font-weight: 500; text-decoration: none; border-radius: 8px; transition: all 0.2s ease; width: 100%; border: none; background: none; cursor: pointer; text-align: left; }
         .dropdown-item:hover { background: rgba(107, 29, 42, 0.04); color: var(--maroon, #6B1D2A); }
