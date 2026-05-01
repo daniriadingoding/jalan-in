@@ -160,10 +160,10 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { backgroundColor: '#6B1D2A', cornerRadius: 8, padding: 10, titleFont: { family: 'Inter' }, bodyFont: { family: 'Inter' } }
+                    tooltip: { backgroundColor: '#6B1D2A', cornerRadius: 8, padding: 10, titleFont: { family: 'Manrope' }, bodyFont: { family: 'Manrope' } }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11, weight: '500' }, color: '#9ca3af' } },
+                    x: { grid: { display: false }, ticks: { font: { family: 'Manrope', size: 11, weight: '500' }, color: '#9ca3af' } },
                     y: { display: false }
                 }
             }

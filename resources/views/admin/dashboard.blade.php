@@ -201,8 +201,8 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: '#6B1D2A',
-                            titleFont: { family: 'Inter', size: 12 },
-                            bodyFont: { family: 'Inter', size: 11 },
+                            titleFont: { family: 'Manrope', size: 12 },
+                            bodyFont: { family: 'Manrope', size: 11 },
                             cornerRadius: 8,
                             padding: 10,
                         }
@@ -211,7 +211,7 @@
                         x: {
                             grid: { display: false },
                             ticks: {
-                                font: { family: 'Inter', size: 11, weight: '500' },
+                                font: { family: 'Manrope', size: 11, weight: '500' },
                                 color: '#9ca3af'
                             }
                         },
