@@ -11,15 +11,36 @@
     @endif
 
     {{-- Header --}}
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
         <div>
             <h1 class="page-title">Pengelolaan Laporan</h1>
             <p class="page-subtitle">Memantau, memvalidasi, dan menetapkan laporan kerusakan infrastruktur jalan dari warga dan sensor otomatis.</p>
         </div>
-        <a href="{{ route('operator.map') }}" class="btn-admin-secondary" style="white-space:nowrap;">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" /></svg>
-            Filter
-        </a>
+        <form method="GET" action="{{ route('operator.reports.index') }}" id="filterForm" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+            @if($search)
+                <input type="hidden" name="search" value="{{ $search }}">
+            @endif
+            
+            <div style="display:flex;align-items:center;gap:8px;">
+                <label for="status" style="font-size:0.8rem;color:#6b7280;font-weight:600;">Status:</label>
+                <select name="status" id="status" class="admin-input" style="padding:8px 12px;min-height:36px;width:auto;" onchange="document.getElementById('filterForm').submit()">
+                    <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="Dilaporkan" {{ ($statusFilter ?? '') === 'Dilaporkan' ? 'selected' : '' }}>Dilaporkan</option>
+                    <option value="Disurvey" {{ ($statusFilter ?? '') === 'Disurvey' ? 'selected' : '' }}>Disurvey (Valid)</option>
+                    <option value="Diproses" {{ ($statusFilter ?? '') === 'Diproses' ? 'selected' : '' }}>Diproses</option>
+                    <option value="Selesai" {{ ($statusFilter ?? '') === 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                    <option value="Tidak Valid" {{ ($statusFilter ?? '') === 'Tidak Valid' ? 'selected' : '' }}>Tidak Valid</option>
+                </select>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px;">
+                <label for="sort" style="font-size:0.8rem;color:#6b7280;font-weight:600;">Urutkan:</label>
+                <select name="sort" id="sort" class="admin-input" style="padding:8px 12px;min-height:36px;width:auto;" onchange="document.getElementById('filterForm').submit()">
+                    <option value="terbaru" {{ ($sort ?? 'terbaru') === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+                    <option value="terlama" {{ ($sort ?? 'terbaru') === 'terlama' ? 'selected' : '' }}>Terlama</option>
+                </select>
+            </div>
+        </form>
     </div>
 
     {{-- Stats --}}

@@ -28,12 +28,29 @@
     <div style="display: grid; grid-template-columns: 1fr 300px; gap: 24px; margin-bottom: 32px;">
         {{-- Chart --}}
         <div class="admin-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <h2 class="section-title">Tren Laporan</h2>
-                <div class="chart-toggle">
-                    <button class="active">Mingguan</button>
-                    <button>Bulanan</button>
-                </div>
+                
+                <form method="GET" action="{{ route('operator.dashboard') }}" id="chartFilterForm" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                    <input type="hidden" name="period" id="periodInput" value="{{ $period ?? 'weekly' }}">
+                    
+                    <select name="year" class="admin-input" style="padding: 6px 10px; min-height: 32px; font-size: 0.8rem; width: auto;" onchange="document.getElementById('chartFilterForm').submit()">
+                        <option value="2026" {{ ($selectedYear ?? 2026) == 2026 ? 'selected' : '' }}>2026</option>
+                        <option value="2025" {{ ($selectedYear ?? 2026) == 2025 ? 'selected' : '' }}>2025</option>
+                    </select>
+
+                    <select name="month" class="admin-input" style="padding: 6px 10px; min-height: 32px; font-size: 0.8rem; width: auto;" onchange="document.getElementById('chartFilterForm').submit()">
+                        @foreach(['01'=>'Jan', '02'=>'Feb', '03'=>'Mar', '04'=>'Apr', '05'=>'Mei', '06'=>'Jun', '07'=>'Jul', '08'=>'Agt', '09'=>'Sep', '10'=>'Okt', '11'=>'Nov', '12'=>'Des'] as $num => $name)
+                            <option value="{{ $num }}" {{ str_pad($selectedMonth ?? date('m'), 2, '0', STR_PAD_LEFT) == $num ? 'selected' : '' }}>{{ $name }}</option>
+                        @endforeach
+                    </select>
+
+                    <div class="chart-toggle" style="margin-left: 4px;">
+                        <button type="button" style="padding: 6px 10px; font-size: 0.75rem;" class="{{ ($period ?? 'weekly') === 'weekly' ? 'active' : '' }}" onclick="document.getElementById('periodInput').value='weekly'; document.getElementById('chartFilterForm').submit()">Minggu</button>
+                        <button type="button" style="padding: 6px 10px; font-size: 0.75rem;" class="{{ ($period ?? 'weekly') === 'monthly' ? 'active' : '' }}" onclick="document.getElementById('periodInput').value='monthly'; document.getElementById('chartFilterForm').submit()">Bulan</button>
+                        <button type="button" style="padding: 6px 10px; font-size: 0.75rem;" class="{{ ($period ?? 'weekly') === 'yearly' ? 'active' : '' }}" onclick="document.getElementById('periodInput').value='yearly'; document.getElementById('chartFilterForm').submit()">Tahun</button>
+                    </div>
+                </form>
             </div>
             <div style="height: 220px;">
                 <canvas id="trendChart"></canvas>

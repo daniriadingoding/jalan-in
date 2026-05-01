@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Report;
 use Carbon\Carbon;
 
+use Illuminate\Http\Request;
+
 class OperatorDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $counts = [
             'dilaporkan'  => Report::where('status', 'Dilaporkan')->count(),
@@ -18,14 +20,50 @@ class OperatorDashboardController extends Controller
             'selesai'     => Report::where('status', 'Selesai')->count(),
         ];
 
-        // Data tren laporan mingguan (7 hari terakhir per hari)
-        $weeklyTrend = [];
-        $days = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
-        $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        // Chart Filtering Logic
+        $period = $request->query('period', 'weekly');
+        $selectedYear = $request->query('year', Carbon::now()->year);
+        $selectedMonth = $request->query('month', Carbon::now()->month);
 
-        for ($i = 0; $i < 7; $i++) {
-            $date = $startOfWeek->copy()->addDays($i);
-            $weeklyTrend[] = Report::whereDate('created_at', $date)->count();
+        $weeklyTrend = [];
+        $days = [];
+
+        if ($period === 'yearly') {
+            for ($i = 1; $i <= 12; $i++) {
+                $monthName = Carbon::create()->month($i)->locale('id')->isoFormat('MMM');
+                $days[] = strtoupper($monthName);
+                
+                $count = Report::whereYear('created_at', $selectedYear)
+                               ->whereMonth('created_at', $i)
+                               ->count();
+                $weeklyTrend[] = $count;
+            }
+        } elseif ($period === 'monthly') {
+            $daysInMonth = Carbon::create($selectedYear, $selectedMonth)->daysInMonth;
+            for ($i = 1; $i <= $daysInMonth; $i++) {
+                $days[] = (string)$i;
+                $count = Report::whereYear('created_at', $selectedYear)
+                               ->whereMonth('created_at', $selectedMonth)
+                               ->whereDay('created_at', $i)
+                               ->count();
+                $weeklyTrend[] = $count;
+            }
+        } else {
+            // Default: Weekly (Rolling 7 Days)
+            $today = Carbon::now();
+            for ($i = 6; $i >= 0; $i--) {
+                $date = $today->copy()->subDays($i);
+                
+                $dayMap = [
+                    'Mon' => 'SEN', 'Tue' => 'SEL', 'Wed' => 'RAB',
+                    'Thu' => 'KAM', 'Fri' => 'JUM', 'Sat' => 'SAB', 'Sun' => 'MIN'
+                ];
+                $dayName = $dayMap[$date->format('D')];
+                $dateString = $date->format('d/m');
+                
+                $days[] = [$dayName, $dateString];
+                $weeklyTrend[] = Report::whereDate('created_at', $date)->count();
+            }
         }
 
         // 3 laporan terbaru
@@ -40,7 +78,8 @@ class OperatorDashboardController extends Controller
             ->get();
 
         return view('operator.dashboard', compact(
-            'counts', 'weeklyTrend', 'days', 'latestReports', 'mapReports'
+            'counts', 'weeklyTrend', 'days', 'latestReports', 'mapReports',
+            'period', 'selectedYear', 'selectedMonth'
         ));
     }
 }

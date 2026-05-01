@@ -140,7 +140,6 @@
                     <th>Avatar dan Nama</th>
                     <th>Alamat Email</th>
                     <th>Peran</th>
-                    <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -169,14 +168,6 @@
                             @endif
                         </td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <span class="status-dot {{ $user->email_verified_at ? 'online' : 'offline' }}"></span>
-                                <span style="font-size: 0.8rem; color: {{ $user->email_verified_at ? '#374151' : '#9ca3af' }};">
-                                    {{ $user->email_verified_at ? 'Active' : 'Inactive' }}
-                                </span>
-                            </div>
-                        </td>
-                        <td>
                             <a href="{{ route('admin.users.show', $user) }}" class="action-btn" title="Lihat detail pengguna">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -187,7 +178,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: #9ca3af;">
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #9ca3af;">
                             @if($search)
                                 Tidak ditemukan pengguna dengan kata kunci "{{ $search }}".
                             @else

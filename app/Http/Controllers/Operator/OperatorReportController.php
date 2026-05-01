@@ -35,13 +35,20 @@ class OperatorReportController extends Controller
             });
         }
 
-        $reports = $query->orderBy('created_at', 'desc')
-            ->paginate(10)
+        // Sort
+        $sort = $request->get('sort', 'terbaru');
+        if ($sort === 'terlama') {
+            $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $reports = $query->paginate(10)
             ->appends($request->query());
 
         return view('operator.reports.index', compact(
             'totalReports', 'pendingValidation', 'completedToday',
-            'reports', 'statusFilter', 'search'
+            'reports', 'statusFilter', 'search', 'sort'
         ));
     }
 

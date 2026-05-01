@@ -74,144 +74,51 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // ===== REPORTS (sample data for testing) =====
+        // ===== REPORTS (sample data for testing filters) =====
+        // Membuat 50 laporan dengan tanggal acak antara awal 2025 hingga saat ini
+        $statuses = ['Dilaporkan', 'Disurvey', 'Tidak Valid', 'Diproses', 'Selesai'];
+        $damageTypes = ['Pothole', 'Crack', 'Uneven', null];
+        $users = [$user1->id, $user2->id, $user3->id];
+        $operators = [$operator1->id, $operator2->id];
 
-        // 1. Status: Dilaporkan (baru, belum ditangani)
-        Report::create([
-            'user_id' => $user1->id,
-            'description' => 'Lubang besar muncul di dekat halte bus, berbahaya bagi pengemudi sepeda motor.',
-            'photo_path' => '',
-            'latitude' => -6.2150,
-            'longitude' => 106.8450,
-            'damage_type' => 'Pothole',
-            'status' => 'Dilaporkan',
-            'created_at' => now()->subHours(2),
-        ]);
+        $startDate = \Carbon\Carbon::create(2025, 1, 1);
+        $endDate = \Carbon\Carbon::now();
 
-        // 2. Status: Dilaporkan
-        Report::create([
-            'user_id' => $user2->id,
-            'description' => 'Jalan retak memanjang sepanjang 5 meter di dekat perempatan.',
-            'photo_path' => '',
-            'latitude' => -6.2200,
-            'longitude' => 106.8500,
-            'damage_type' => null,
-            'status' => 'Dilaporkan',
-            'created_at' => now()->subHours(5),
-        ]);
+        for ($i = 0; $i < 50; $i++) {
+            $randomDate = \Carbon\Carbon::createFromTimestamp(rand($startDate->timestamp, $endDate->timestamp));
+            $status = $statuses[array_rand($statuses)];
+            $damageType = $damageTypes[array_rand($damageTypes)];
+            
+            // Random coordinates around Jakarta
+            $lat = -6.2000 + (rand(-100, 100) / 1000);
+            $lng = 106.8000 + (rand(-100, 100) / 1000);
 
-        // 3. Status: Disurvey
-        Report::create([
-            'user_id' => $user1->id,
-            'description' => 'Permukaan jalan ambles di depan minimarket, kedalaman sekitar 15cm.',
-            'photo_path' => '',
-            'latitude' => -6.2088,
-            'longitude' => 106.8456,
-            'damage_type' => 'Pothole',
-            'status' => 'Disurvey',
-            'operator_id' => $operator1->id,
-            'verified_at' => now()->subHours(3),
-            'created_at' => now()->subDay(),
-        ]);
+            $reportData = [
+                'user_id' => $users[array_rand($users)],
+                'description' => 'Contoh deskripsi laporan kerusakan jalan otomatis ke-' . ($i + 1),
+                'photo_path' => '',
+                'latitude' => $lat,
+                'longitude' => $lng,
+                'damage_type' => $damageType,
+                'status' => $status,
+                'created_at' => $randomDate,
+                'updated_at' => $randomDate,
+            ];
 
-        // 4. Status: Diproses (sedang diperbaiki)
-        Report::create([
-            'user_id' => $user3->id,
-            'description' => 'Aspal terkelupas di jalur lambat, area seluas 2x3 meter.',
-            'photo_path' => '',
-            'latitude' => -6.1951,
-            'longitude' => 106.8235,
-            'damage_type' => 'Pothole',
-            'status' => 'Diproses',
-            'operator_id' => $operator1->id,
-            'verified_at' => now()->subDays(2),
-            'created_at' => now()->subDays(3),
-        ]);
+            if (in_array($status, ['Disurvey', 'Tidak Valid', 'Diproses', 'Selesai'])) {
+                $reportData['operator_id'] = $operators[array_rand($operators)];
+                $reportData['verified_at'] = $randomDate->copy()->addHours(rand(1, 48));
+            }
 
-        // 5. Status: Diproses
-        Report::create([
-            'user_id' => $user2->id,
-            'description' => 'Keretakan parah di jalan utama dekat sekolah, membahayakan pejalan kaki.',
-            'photo_path' => '',
-            'latitude' => -6.2350,
-            'longitude' => 106.8600,
-            'damage_type' => 'Crack',
-            'status' => 'Diproses',
-            'operator_id' => $operator2->id,
-            'verified_at' => now()->subDays(4),
-            'created_at' => now()->subDays(5),
-        ]);
+            if ($status === 'Selesai') {
+                $reportData['completed_at'] = $randomDate->copy()->addDays(rand(2, 14));
+            }
 
-        // 6. Status: Selesai (sudah diperbaiki)
-        Report::create([
-            'user_id' => $user1->id,
-            'description' => 'Lubang jalan di persimpangan sudah diperbaiki oleh tim dinas PU.',
-            'photo_path' => '',
-            'latitude' => -6.1750,
-            'longitude' => 106.8270,
-            'damage_type' => 'Pothole',
-            'status' => 'Selesai',
-            'operator_id' => $operator1->id,
-            'verified_at' => now()->subDays(7),
-            'completed_at' => now()->subDays(1),
-            'evidence_photo_path' => '',
-            'created_at' => now()->subDays(8),
-        ]);
+            if ($status === 'Tidak Valid') {
+                $reportData['rejection_note'] = 'Laporan ditolak secara otomatis (sample data).';
+            }
 
-        // 7. Status: Tidak Valid (foto bukan kerusakan jalan)
-        Report::create([
-            'user_id' => $user3->id,
-            'description' => 'Foto yang diunggah bukan foto kerusakan jalan.',
-            'photo_path' => '',
-            'latitude' => -6.2500,
-            'longitude' => 106.8800,
-            'damage_type' => null,
-            'status' => 'Tidak Valid',
-            'operator_id' => $operator2->id,
-            'rejection_note' => 'Foto tidak menunjukkan kerusakan jalan, melainkan foto pemandangan.',
-            'created_at' => now()->subDays(2),
-        ]);
-
-        // 8. Status: Dilaporkan (another one)
-        Report::create([
-            'user_id' => $user2->id,
-            'description' => 'Ada genangan air yang tidak surut di jalan, kemungkinan pipa bocor di bawah aspal.',
-            'photo_path' => '',
-            'latitude' => -6.2300,
-            'longitude' => 106.8350,
-            'damage_type' => null,
-            'status' => 'Dilaporkan',
-            'created_at' => now()->subMinutes(30),
-        ]);
-
-        // 9. Status: Selesai
-        Report::create([
-            'user_id' => $user3->id,
-            'description' => 'Trotoar rusak di sepanjang jalan menuju stasiun, sudah diperbaiki.',
-            'photo_path' => '',
-            'latitude' => -6.1850,
-            'longitude' => 106.8100,
-            'damage_type' => 'Crack',
-            'status' => 'Selesai',
-            'operator_id' => $operator2->id,
-            'verified_at' => now()->subDays(10),
-            'completed_at' => now()->subDays(3),
-            'evidence_photo_path' => '',
-            'created_at' => now()->subDays(12),
-        ]);
-
-        // 10. Status: Disurvey
-        Report::create([
-            'user_id' => $user1->id,
-            'description' => 'Lubang kecil di bahu jalan, mulai membesar karena hujan deras kemarin.',
-            'photo_path' => '',
-            'latitude' => -6.2020,
-            'longitude' => 106.8680,
-            'damage_type' => 'Pothole',
-            'status' => 'Disurvey',
-            'operator_id' => $operator1->id,
-            'verified_at' => now()->subHours(8),
-            'created_at' => now()->subDays(1)->subHours(4),
-        ]);
+            Report::create($reportData);
+        }
     }
 }
