@@ -10,7 +10,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
@@ -20,7 +20,7 @@
 
     <style>
         /* ===== Admin Layout ===== */
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Manrope', sans-serif; }
 
         .admin-wrapper {
             display: flex;
@@ -609,8 +609,10 @@
         {{-- ===== SIDEBAR ===== --}}
         <aside class="admin-sidebar">
             <div class="sidebar-brand">
-                <h1>jalan.in</h1>
-                <p>Pemantauan Jalan</p>
+                <a href="{{ route('admin.dashboard') }}" style="text-decoration:none;">
+                    <h1>jalan.in</h1>
+                    <p>Pemantauan Jalan</p>
+                </a>
             </div>
 
             <nav class="sidebar-nav">
@@ -642,7 +644,12 @@
                 </div>
                 <div class="sidebar-user-info">
                     <h4>{{ Auth::user()->name ?? 'Admin' }}</h4>
-                    <p>Super Admin</p>
+                    <p>
+                        @if(Auth::user()->role === 'admin') Super Admin
+                        @elseif(Auth::user()->role === 'operator') Operator
+                        @else User
+                        @endif
+                    </p>
                 </div>
             </div>
         </aside>

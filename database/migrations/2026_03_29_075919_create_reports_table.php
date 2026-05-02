@@ -26,7 +26,9 @@ return new class extends Migration
             $table->string('ai_photo_path')->nullable(); // Path foto dengan bounding box hasil AI
 
             // Status & Manajemen Operator
-            $table->enum('status', ['Dilaporkan', 'Diproses', 'Ditolak', 'Selesai'])->default('Dilaporkan');
+            // Alur: Dilaporkan -> Disurvey -> Diproses -> Selesai
+            // Atau: Dilaporkan -> Tidak Valid (foto bukan kerusakan jalan)
+            $table->enum('status', ['Dilaporkan', 'Disurvey', 'Tidak Valid', 'Diproses', 'Selesai'])->default('Dilaporkan');
             $table->foreignId('operator_id')->nullable()->constrained('users')->nullOnDelete(); // Operator yang menangani
             $table->text('rejection_note')->nullable(); // Alasan penolakan oleh operator
 

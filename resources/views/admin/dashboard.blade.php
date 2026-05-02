@@ -76,12 +76,28 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
             <div>
                 <h2 class="section-title">Aktivitas Sistem</h2>
-                <p class="section-subtitle">Volume permintaan dan latensi pemrosesan</p>
+                <p class="section-subtitle">Volume permintaan dan laporan baru</p>
             </div>
-            <div class="chart-toggle">
-                <button class="active">Mingguan</button>
-                <button>Bulanan</button>
-            </div>
+            <form method="GET" action="{{ route('admin.dashboard') }}" id="chartFilterForm" style="display: flex; gap: 12px; align-items: center;">
+                <input type="hidden" name="period" id="periodInput" value="{{ $period ?? 'weekly' }}">
+                
+                <select name="year" class="admin-input" style="padding: 6px 12px; min-height: 36px;" onchange="document.getElementById('chartFilterForm').submit()">
+                    <option value="2026" {{ ($selectedYear ?? 2026) == 2026 ? 'selected' : '' }}>2026</option>
+                    <option value="2025" {{ ($selectedYear ?? 2026) == 2025 ? 'selected' : '' }}>2025</option>
+                </select>
+
+                <select name="month" class="admin-input" style="padding: 6px 12px; min-height: 36px;" onchange="document.getElementById('chartFilterForm').submit()">
+                    @foreach(['01'=>'Jan', '02'=>'Feb', '03'=>'Mar', '04'=>'Apr', '05'=>'Mei', '06'=>'Jun', '07'=>'Jul', '08'=>'Agt', '09'=>'Sep', '10'=>'Okt', '11'=>'Nov', '12'=>'Des'] as $num => $name)
+                        <option value="{{ $num }}" {{ str_pad($selectedMonth ?? date('m'), 2, '0', STR_PAD_LEFT) == $num ? 'selected' : '' }}>{{ $name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="chart-toggle" style="margin-left: 8px;">
+                    <button type="button" class="{{ ($period ?? 'weekly') === 'weekly' ? 'active' : '' }}" onclick="document.getElementById('periodInput').value='weekly'; document.getElementById('chartFilterForm').submit()">Mingguan</button>
+                    <button type="button" class="{{ ($period ?? 'weekly') === 'monthly' ? 'active' : '' }}" onclick="document.getElementById('periodInput').value='monthly'; document.getElementById('chartFilterForm').submit()">Bulanan</button>
+                    <button type="button" class="{{ ($period ?? 'weekly') === 'yearly' ? 'active' : '' }}" onclick="document.getElementById('periodInput').value='yearly'; document.getElementById('chartFilterForm').submit()">Tahunan</button>
+                </div>
+            </form>
         </div>
         <div style="height: 240px;">
             <canvas id="activityChart"></canvas>
@@ -95,7 +111,7 @@
                 <h2 class="section-title">Pengelolaan Operator</h2>
                 <p class="section-subtitle">Gambaran singkat mengenai tenaga kerja operasional saat ini.</p>
             </div>
-            <a href="{{ route('admin.users.create') }}" class="btn-admin-primary">
+            <a href="{{ route('admin.users.add') }}" class="btn-admin-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
@@ -107,8 +123,6 @@
             <thead>
                 <tr>
                     <th>Nama</th>
-                    <th>Wilayah</th>
-                    <th>Status</th>
                     <th>Sinkronisasi Terakhir</th>
                     <th>Aksi</th>
                 </tr>
@@ -124,11 +138,6 @@
                                 <span style="font-weight: 600; color: #1a1a1a;">{{ $operator->name }}</span>
                             </div>
                         </td>
-                        <td>{{ $operator->region ?? '-' }}</td>
-                        <td>
-                            <span class="badge {{ $operator->last_login_at ? 'badge-success' : 'badge-neutral' }}">
-                                {{ $operator->last_login_at ? 'AKTIF' : 'OFFLINE' }}
-                            </span>
                         </td>
                         <td style="font-size: 0.8rem; color: #9ca3af;">
                             {{ $operator->updated_at?->diffForHumans() ?? '-' }}
@@ -143,7 +152,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: #9ca3af;">
+                        <td colspan="3" style="text-align: center; padding: 40px; color: #9ca3af;">
                             Belum ada operator terdaftar.
                         </td>
                     </tr>
@@ -165,22 +174,21 @@
             gradient2.addColorStop(0, 'rgba(139, 46, 59, 0.45)');
             gradient2.addColorStop(1, 'rgba(139, 46, 59, 0.1)');
 
+            const dataValues = @json($weeklyTrend);
+            
+            // Beri warna khusus (gradient) untuk hari terakhir (hari ini)
+            const bgColors = dataValues.map((val, index) => {
+                return index === dataValues.length - 1 ? gradient1 : 'rgba(139, 46, 59, 0.35)';
+            });
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'],
+                    labels: @json($days),
                     datasets: [{
-                        label: 'Permintaan',
-                        data: [18, 15, 22, 28, 20, 24, 30],
-                        backgroundColor: [
-                            'rgba(139, 46, 59, 0.35)',
-                            'rgba(139, 46, 59, 0.4)',
-                            'rgba(139, 46, 59, 0.45)',
-                            'rgba(107, 29, 42, 0.7)',
-                            'rgba(139, 46, 59, 0.35)',
-                            'rgba(139, 46, 59, 0.4)',
-                            gradient1
-                        ],
+                        label: 'Laporan Masuk',
+                        data: dataValues,
+                        backgroundColor: bgColors,
                         borderRadius: 8,
                         borderSkipped: false,
                         barThickness: 40,
@@ -193,8 +201,8 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: '#6B1D2A',
-                            titleFont: { family: 'Inter', size: 12 },
-                            bodyFont: { family: 'Inter', size: 11 },
+                            titleFont: { family: 'Manrope', size: 12 },
+                            bodyFont: { family: 'Manrope', size: 11 },
                             cornerRadius: 8,
                             padding: 10,
                         }
@@ -203,7 +211,7 @@
                         x: {
                             grid: { display: false },
                             ticks: {
-                                font: { family: 'Inter', size: 11, weight: '500' },
+                                font: { family: 'Manrope', size: 11, weight: '500' },
                                 color: '#9ca3af'
                             }
                         },
