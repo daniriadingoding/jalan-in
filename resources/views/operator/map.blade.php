@@ -103,38 +103,9 @@
         color: #4b5563;
     }
 
-    .map-search {
-        position: absolute;
-        top: 16px;
-        left: 260px;
-        right: 160px;
-        z-index: 1000;
-    }
-
-    .map-search input {
-        width: 100%;
-        max-width: 420px;
-        padding: 12px 16px 12px 42px;
-        border-radius: 12px;
-        border: 1px solid rgba(107, 29, 42, 0.08);
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(8px);
-        font-size: 0.85rem;
-        color: #1a1a1a;
-        outline: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    }
 </style>
 
 <div class="map-wrapper">
-    {{-- Search Bar --}}
-    <div class="map-search">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#9ca3af" width="18" height="18" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-        </svg>
-        <input type="text" id="mapSearch" placeholder="Cari koordinat, nama jalan...">
-    </div>
-
     {{-- Filter --}}
     <div class="map-filter-panel">
         <div style="display: flex; justify-content: space-between; align-items: center;">
